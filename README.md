@@ -38,6 +38,8 @@ codes...
 
 ## Design overview
 
+https://www.figma.com/design/DD8tqjLX2vkJ25wtVQWqyW/Untitled?node-id=0-1&p=f&t=sabBzhhsEHafkuPZ-0
+
 The application design is based on the template provided, with adjustments to match the functionality required.
 
 ## Tips and Tricks
