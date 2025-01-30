@@ -10,6 +10,7 @@ Descirption du projet
 **Client:** 
 - HTML/CSS for the front-end.
 - JavaScript for dynamic functionalities.
+- React
 
 **Server:** 
 - Mongodb, Node.js
