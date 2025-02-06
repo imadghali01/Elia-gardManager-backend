@@ -1,17 +1,20 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("../connection.js"); // Assure-toi que le chemin est correct
+router.get("/login", async (req, res) => {
+  try {
+    // Récupère la collection 'users' depuis la connexion établie
+    const usersCollection = mongoose.connection.db.collection("users");
+    const users = await usersCollection.find({}).toArray();
 
-/*
-app.post("/gard-manager/switch_offer", (req, res) => {});
-app.post("/gard-manager/switch_request", (req, res) => {});
-app.post("/gard-manager/switch_requests/state", (req, res) => {});
-app.get("/gard-manager/login", (req, res) => {});
-app.get("/gard-manager/schedule", (req, res) => {});
-app.get("/gard-manager/switch_offer", (req, res) => {});
-app.get("/gard-manager/switch_requests/sickness", (req, res) => {});
-app.get("/gard-manager/switch_requests/holydays", (req, res) => {});
-app.get("/gard-manager/switch_requests/classics", (req, res) => {});
-app.get("/gard-manager/switch_requests/states", (req, res) => {});
-*/
+    // Récupère le premier couple clé/valeur du premier utilisateur
+    const firstUser = users;
+
+    res.json(firstUser);
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'utilisateur:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
 
 module.exports = router;
