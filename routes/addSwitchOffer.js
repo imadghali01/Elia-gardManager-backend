@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("../connection.js"); // Assure-toi que le chemin est correct
+const mongoose = require("../connection.js");
 
-router.get("/login", async (req, res) => {
+router.post("/add_switch_offer", async (req, res) => {
   try {
     // Récupère la collection 'users' depuis la connexion établie
     const usersCollection = mongoose.connection.db.collection("users");
