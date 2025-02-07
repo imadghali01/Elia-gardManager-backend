@@ -3,18 +3,24 @@ const router = express.Router();
 const mongoose = require("../connection.js");
 
 router.post("/add_schedule", async (req, res) => {
-  try {
-    // Récupère la collection 'users' depuis la connexion établie
-    const usersCollection = mongoose.connection.db.collection("users");
-    const users = await usersCollection.find({}).toArray();
+  async function addScheduleForUsers() {
+    try {
+      const users = await User.find();
+      if (users.length === 0) {
+        console.log("⚠️ Aucun utilisateur trouvé !");
+        return;
+      }
 
-    // Récupère le premier couple clé/valeur du premier utilisateur
-    const firstUser = users;
-
-    res.json(firstUser);
-  } catch (error) {
-    console.error("Erreur lors de la récupération de l'utilisateur:", error);
-    res.status(500).json({ error: "Erreur serveur" });
+      for (const user of users) {
+        const existingSchedule = await Schedule.findOne({ email: user.email });
+        if (!existingSchedule) {
+          await Schedule.create({ email: user.email });
+          console.log(`✅ Planning ajouté pour ${user.email}`);
+        }
+      }
+    } catch (error) {
+      console.error("❌ Erreur lors de la création des plannings :", error);
+    }
   }
 });
 

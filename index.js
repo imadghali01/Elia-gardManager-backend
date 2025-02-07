@@ -1,13 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const port = 8000;
-const users = require("./routes/users");
+const login = require("./routes/login");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/users", users); // Les routes définies dans users.js seront accessibles via /users (exemple : GET /users/login)
+app.use("/login", login); // Les routes définies dans login.js seront accessibles via /login (exemple : GET /users/login)
 
 // Démarrer le serveur Express
 app.listen(port, () => {
