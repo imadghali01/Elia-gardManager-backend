@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("../connection.js");
 
-router.post("/add_status", async (req, res) => {
+router.put("/update_status", async (req, res) => {
   try {
     // Récupère la collection 'users' depuis la connexion établie
     const usersCollection = mongoose.connection.db.collection("users");
