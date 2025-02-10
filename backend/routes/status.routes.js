@@ -11,6 +11,6 @@ router.post("/", setStatus);
 
 router.get("/", getStatus);
 
-router.put("/", putStatus);
+router.put("/:id", putStatus);
 
 module.exports = router;

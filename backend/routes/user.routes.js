@@ -15,8 +15,8 @@ router.get("/login", getLogin);
 
 router.get("/", getUsers);
 
-router.put("/", putUser);
+router.put("/:id", putUser);
 
-router.delete("/", delUser);
+router.delete("/:id", delUser);
 
 module.exports = router;

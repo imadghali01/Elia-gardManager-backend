@@ -10,10 +10,10 @@ const {
 
 router.post("/", setSchedule);
 
-router.get("/", getSchedule);
+router.get("/:id", getSchedule);
 
-router.put("/", putSchedule);
+router.put("/:id", putSchedule);
 
-router.delete("/", delSchedule);
+router.delete("/:id", delSchedule);
 
 module.exports = router;

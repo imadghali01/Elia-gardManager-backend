@@ -12,8 +12,8 @@ router.post("/", setSwitch);
 
 router.get("/", getSwitchs);
 
-router.put("/", putSwitchState);
+router.put("/:id", putSwitchState);
 
-router.delete("/", delSwitch);
+router.delete("/:id", delSwitch);
 
 module.exports = router;
