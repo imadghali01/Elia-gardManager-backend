@@ -2,15 +2,13 @@ const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema(
   {
-    contractNR: Number,
+    email: String,
     passWord: String,
-    firstName: String,
-    lastName: String,
-    gender: { type: String, enum: ["Homme", "Femme"] },
+    fullName: String,
+    gender: { type: String, enum: ["Mr", "Mrs"] },
     activity: { type: String, enum: ["Admin", "Viewer", "User"] },
     address: String,
     location: String,
-    email: String,
     phone: String,
   },
   { timestamps: true }
