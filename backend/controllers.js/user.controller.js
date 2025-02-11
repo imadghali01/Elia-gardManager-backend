@@ -19,7 +19,7 @@ module.exports = {
       if (!passWord || !fullName || !email) {
         return res.status(400).json({
           error:
-            "Les champs contractNR, passWord, firstName, lastName et email sont obligatoires",
+            "Les champs passWord, fullName et email sont obligatoires",
         });
       }
 
