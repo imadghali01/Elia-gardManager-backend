@@ -61,7 +61,7 @@ module.exports = {
   },
 
   // Vérification des identifiants pour la connexion
-  getLogin: async (req, res) => {
+  login: async (req, res) => {
     try {
       const { email, passWord } = req.body;
 
