@@ -5,8 +5,8 @@ const statusSchema = mongoose.Schema(
     user: { type: String, unique: true, required: true },
     State: {
       type: String,
-      enum: ["Up", "Ongard", "Sickness", "Holidays"],
-      default: "Up",
+      enum: ["up", "ongard", "sickness", "holidays"],
+      default: "up",
     },
     statusIn: Date,
     statusOut: Date,
