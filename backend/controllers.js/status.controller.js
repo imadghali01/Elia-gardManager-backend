@@ -1,5 +1,7 @@
 const Status = require("../models/status");
 
+// Status.collection.drop();
+
 module.exports = {
   /**
    * Crée un nouveau status.

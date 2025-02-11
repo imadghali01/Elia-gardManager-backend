@@ -2,8 +2,12 @@ const mongoose = require("mongoose");
 
 const switchSchema = mongoose.Schema(
   {
-    userOne: String,
-    userTwo: { type: String, default: null },
+    userOne: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    userTwo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     type: {
       type: String,
       enum: ["offer", "request"],

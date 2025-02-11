@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const statusSchema = mongoose.Schema(
   {
-    user: { type: String, required: true },
-    State: {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    state: {
       type: String,
       enum: ["up", "ongard", "sickness", "holidays"],
       default: "up",

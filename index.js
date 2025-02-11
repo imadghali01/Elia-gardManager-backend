@@ -8,7 +8,6 @@ const port = 8000;
 connectDB();
 
 const app = express();
-
 //app mandatory imports
 app.use(cors());
 app.use(express.json());
