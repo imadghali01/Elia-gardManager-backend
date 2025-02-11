@@ -5,7 +5,7 @@ const userSchema = mongoose.Schema(
     email: String,
     passWord: String,
     fullName: String,
-    gender: { type: String, enum: ["homme", "femme"] },
+    gender: { type: String, enum: ["Mr", "Mrs"] },
     activity: { type: String, enum: ["admin", "viewer", "user"] },
     address: String,
     location: String,
