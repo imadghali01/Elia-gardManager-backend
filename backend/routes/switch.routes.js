@@ -5,15 +5,18 @@ const {
   setSwitch,
   getSwitchs,
   putSwitchState,
+  getSwitchBalance,
   delSwitch,
-} = require("../controllers/switch.controller");
+} = require("../controllers/switch.controller.js");
 
 router.post("/", setSwitch);
 
 router.get("/", getSwitchs);
 
-router.put("/", putSwitchState);
+router.get("/:id", getSwitchBalance);
 
-router.delete("/", delSwitch);
+router.put("/:id", putSwitchState);
+
+router.delete("/:id", delSwitch);
 
 module.exports = router;

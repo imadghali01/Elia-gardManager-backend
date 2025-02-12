@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 
 const statusSchema = mongoose.Schema(
   {
-    user: { type: Number, unique: true, required: true },
-    State: {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    state: {
       type: String,
-      enum: ["Up", "Ongard", "Sickness", "Holidays"],
-      default: "Up",
+      enum: ["up", "ongard", "sickness", "holidays"],
+      default: "up",
     },
     statusIn: Date,
     statusOut: Date,

@@ -5,10 +5,8 @@ module.exports = {
   setUser: async (req, res) => {
     try {
       const {
-        contractNR,
         passWord,
-        firstName,
-        lastName,
+        fullName,
         gender,
         activity,
         address,
@@ -18,10 +16,9 @@ module.exports = {
       } = req.body;
 
       // Vérification des champs obligatoires (adapter selon vos besoins)
-      if (!contractNR || !passWord || !firstName || !lastName || !email) {
+      if (!passWord || !fullName || !email) {
         return res.status(400).json({
-          error:
-            "Les champs contractNR, passWord, firstName, lastName et email sont obligatoires",
+          error: "Les champs passWord, fullName et email sont obligatoires",
         });
       }
 
@@ -35,10 +32,8 @@ module.exports = {
 
       // Création et sauvegarde du nouvel utilisateur
       const newUser = new User({
-        contractNR,
         passWord,
-        firstName,
-        lastName,
+        fullName,
         gender,
         activity,
         address,
@@ -65,7 +60,7 @@ module.exports = {
   },
 
   // Vérification des identifiants pour la connexion
-  getLogin: async (req, res) => {
+  login: async (req, res) => {
     try {
       const { email, passWord } = req.body;
 

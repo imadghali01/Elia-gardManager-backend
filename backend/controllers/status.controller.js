@@ -1,5 +1,7 @@
 const Status = require("../models/status");
 
+// Status.collection.drop();
+
 module.exports = {
   /**
    * Crée un nouveau status.
@@ -39,6 +41,7 @@ module.exports = {
   putStatus: async (req, res) => {
     try {
       const { id } = req.params;
+
       if (!id) {
         return res
           .status(400)

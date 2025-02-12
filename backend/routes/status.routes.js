@@ -5,12 +5,12 @@ const {
   setStatus,
   getStatus,
   putStatus,
-} = require("../controllers/status.controller");
+} = require("../controllers/status.controller.js");
 
 router.post("/", setStatus);
 
 router.get("/", getStatus);
 
-router.put("/", putStatus);
+router.put("/:id", putStatus);
 
 module.exports = router;
