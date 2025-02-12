@@ -1,17 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const { setSchedule, getSchedule, putSchedule, delSchedule } = require("../controllers/schedule.controller");
+const {
+    createSchedule, 
+    getUserSchedule, 
+    updateDaySchedule, 
+    deleteSchedule, 
+    addScheduleSlot 
+} = require("../controllers/schedule.controller");
 
-// ✅ Route pour créer un horaire
-router.post("/", setSchedule);
+// ✅ Route pour créer un planning de 6 semaines pour un utilisateur
+router.post("/", createSchedule);
 
-// ✅ Route pour récupérer tous les horaires
-router.get("/", getSchedule);
+// ✅ Route pour récupérer le planning d'un utilisateur
+router.get("/:userId", getUserSchedule);
 
-// ✅ Route pour modifier un horaire (avec un ID dans l'URL)
-router.put("/:id", putSchedule);
+// ✅ Route pour modifier un jour spécifique d'une semaine
+router.put("/:userId/week/:weekNumber/day/:day", updateDaySchedule);
 
-// ✅ Route pour supprimer un horaire (avec un ID)
-router.delete("/:id", delSchedule);
+// ✅ Route pour ajouter un créneau horaire dans un jour spécifique
+router.put("/:userId/week/:weekNumber/day/:day/add-slot", addScheduleSlot);
+
+// ✅ Route pour supprimer un planning d'un utilisateur
+router.delete("/:userId", deleteSchedule);
 
 module.exports = router;
