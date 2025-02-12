@@ -29,6 +29,41 @@ module.exports = {
     }
   },
 
+  getSwitchBalance: async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+      // Récupération des switches où l'utilisateur est dans le champ userOne
+      const switches = await Switch.find({ userOne: userId });
+      let userBalance = 0;
+      const msPerDay = 24 * 60 * 60 * 1000; // Nombre de millisecondes dans une journée
+
+      for (let sw of switches) {
+        if (sw.state !== "validate") continue;
+
+        // Conversion des dates en objets Date
+        const dateIn = new Date(sw.dateIn);
+        const dateOut = new Date(sw.dateOut);
+
+        // Calcul de la différence en jours de façon robuste
+        // Utilisation de Math.floor et ajout de 1 pour inclure le jour de départ
+        const diffDays = Math.floor((dateOut - dateIn) / msPerDay) + 1;
+
+        if (sw.type === "offer") {
+          userBalance += diffDays;
+        } else if (sw.type === "request") {
+          userBalance -= diffDays;
+        }
+      }
+
+      // Renvoie le résultat sous forme d'entier (nombre de jours)
+      res.json({ userBalance });
+    } catch (error) {
+      console.error("Erreur lors de la récupération des switches:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  },
+
   /**
    * Met à jour l'état (state) d'un switch identifié par son id.
    * Expects : dans req.params l'id et dans req.body la nouvelle valeur { state: true/false }
