@@ -7,7 +7,7 @@ const {
   putSwitchState,
   getSwitchBalance,
   delSwitch,
-} = require("../controllers.js/switch.controller.js");
+} = require("../controllers/switch.controller.js");
 
 router.post("/", setSwitch);
 
