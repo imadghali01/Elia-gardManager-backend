@@ -5,7 +5,7 @@ const {
   setStatus,
   getStatus,
   putStatus,
-} = require("../controllers.js/status.controller.js");
+} = require("../controllers/status.controller");
 
 router.post("/", setStatus);
 

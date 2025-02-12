@@ -1,19 +1,17 @@
 const express = require("express");
 const router = express.Router();
+const { setSchedule, getSchedule, putSchedule, delSchedule } = require("../controllers/schedule.controller");
 
-const {
-  setSchedule,
-  getSchedule,
-  putSchedule,
-  delSchedule,
-} = require("../controllers.js/schedule.controller.js");
-
+// ✅ Route pour créer un horaire
 router.post("/", setSchedule);
 
+// ✅ Route pour récupérer tous les horaires
 router.get("/", getSchedule);
 
-router.put("/", putSchedule);
+// ✅ Route pour modifier un horaire (avec un ID dans l'URL)
+router.put("/:id", putSchedule);
 
-router.delete("/", delSchedule);
+// ✅ Route pour supprimer un horaire (avec un ID)
+router.delete("/:id", delSchedule);
 
 module.exports = router;
