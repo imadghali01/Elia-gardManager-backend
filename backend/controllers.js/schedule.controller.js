@@ -72,7 +72,7 @@ module.exports = {
       for (const [key, value] of Object.entries(schedule)) {
         if (!Array.isArray(value) || value.length !== 3) {
           return res.status(400).json({
-            message: `La valeur associée à '${key}' doit être un tableau de 3 éléments.`,
+            message: `La valeur associée à '${key}' doit être un tableau de 3 éléments(date,userid,status).`,
           });
         }
       }
