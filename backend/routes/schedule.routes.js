@@ -6,7 +6,7 @@ const {
   getSchedule,
   putSchedule,
   delSchedule,
-} = require("../controllers.js/schedule.controller.js");
+} = require("../controllers/schedule.controller");
 
 router.post("/", setSchedule);
 
