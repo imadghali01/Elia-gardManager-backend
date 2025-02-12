@@ -7,7 +7,7 @@ const {
   getUsers,
   putUser,
   delUser,
-} = require("../controllers.js/user.controller.js");
+} = require("../controllers/user.controller.js");
 
 router.post("/", setUser);
 
