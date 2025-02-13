@@ -80,6 +80,39 @@ module.exports = {
           .json({ error: "email et/ou mot de passe incorrect" });
       }
 
+     // 🔹 Stocker l'ID utilisateur en session
+      req.session.userId = user._id; // {req.session.userId} -> Permet aux routes d'accéder à l'ID utilisateur sans passé par userId dans req.params. Ca stock l'ID unique de l'utilisateur que l'on récupère de Mongodb. {req.session} -> c'est un object utiliser par express session que j'ai installer dans le terminal, pour stocker des données de session côté serveur.
+
+      return res.status(200).json({
+        message: "Connexion réussie", // ça informe à le frontend que la connecion est réussie.
+        userId: req.session.userId, // --> Ici ça retourne l'ID stocké en session, pour faire la vérification côté frontend.
+      });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  },
+
+  // 🔹 Déconnexion de l'utilisateur et suppression de la session
+  logout: (req, res) => {
+    req.session.destroy(err => {
+      if (err) return res.status(500).json({ error: "Erreur lors de la déconnexion" });
+
+      res.status(200).json({ message: "Déconnexion réussie" });
+    });
+  },
+
+  // 🔹 Récupération de l'utilisateur connecté via la session
+  getCurrentUser: async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Utilisateur non connecté" });
+      }
+
+      const user = await User.findById(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      }
+
       return res.status(200).json(user);
     } catch (error) {
       return res.status(500).json({ error: error.message });
