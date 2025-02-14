@@ -1,23 +1,10 @@
 const mongoose = require("mongoose");
 
+// Définition d'un schéma vide avec strict: false pour accepter n'importe quel champ
 const scheduleSchema = new mongoose.Schema(
-  {
-    schedule: {
-      type: Map,
-      of: {
-        type: Array,
-        validate: {
-          validator: function (value) {
-            return Array.isArray(value) && value.length === 3;
-          },
-          message:
-            'Chaque valeur du schedule doit être un tableau de deux éléments [date, { type: mongoose.Schema.Types.ObjectId, ref: "User" }, { type: mongoose.Schema.Types.ObjectId, ref: "Status" },].',
-        },
-      },
-      default: {},
-    },
-  },
-  { timestamps: true }
+  {},
+  { strict: false, timestamps: true }
 );
 
+// Exportation du modèle "Schedule" qui utilisera la collection "schedules" dans MongoDB
 module.exports = mongoose.model("Schedule", scheduleSchema);
