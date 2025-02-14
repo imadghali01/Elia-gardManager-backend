@@ -7,13 +7,26 @@ module.exports = {
    */
   setSwitch: async (req, res) => {
     try {
+      const { userOne, userTwo, type, dateIn, dateOut } = req.body;
+
+    // Vérification des champs obligatoires
+    if (!userOne || !type || !dateIn) {
+      return res.status(400).json({ message: "Données manquantes" });
+      }
       // Création d'une nouvelle instance du modèle à partir des données reçues dans req.body
-      const newSwitch = new Switch(req.body);
+      const newSwitch = new Switch({
+        userOne,
+        userTwo: userTwo || null, // Optionnel
+        type,
+        state: "waiting", // État initial
+        dateIn,
+        dateOut: dateOut || null, // Optionnel
+      });
       await newSwitch.save();
-      res.status(201).json(newSwitch);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
+    res.status(201).json({ message: "Switch enregistré avec succès", newSwitch });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de l'enregistrement", error });
+  }
   },
 
   /**

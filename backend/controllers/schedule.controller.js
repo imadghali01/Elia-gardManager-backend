@@ -1,111 +1,69 @@
 const Schedule = require("../models/schedule");
-const mongoose = require("mongoose");
 
-// Fonction pour générer un planning de 6 semaines
-const generateWeeksSchedule = (userId) => {
-    const weeks = [];
-    const startDate = new Date(); // Date actuelle
-
-    for (let week = 0; week < 6; week++) {
-        const days = {};
-        const weekStartDate = new Date(startDate);
-        weekStartDate.setDate(startDate.getDate() + week * 7);
-
-        ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"].forEach((day, index) => {
-            const dayDate = new Date(weekStartDate);
-            dayDate.setDate(weekStartDate.getDate() + index);
-
-            days[day] = [{ date: dayDate, user: userId, status: new mongoose.Types.ObjectId() }]; // Génère une entrée par défaut
-        });
-
-        weeks.push({ weekNumber: week + 1, days });
-    }
-
-    return weeks;
-};
-
-// ✅ **1. Ajouter un planning de 6 semaines pour un utilisateur**
-module.exports.createSchedule = async (req, res) => {
+module.exports = {
+  /**
+   * Crée un nouvel horaire.
+   * On attend dans req.body un objet JSON qui sera directement enregistré.
+   */
+  setSchedule: async (req, res) => {
     try {
-        const { user } = req.body;
-
-        if (!user) {
-            return res.status(400).json({ message: "L'ID de l'utilisateur est requis." });
-        }
-
-        const newSchedule = new Schedule({
-            user,
-            weeks: generateWeeksSchedule(user),
-        });
-
-        await newSchedule.save();
-        res.status(201).json({ message: "Planning généré avec succès", schedule: newSchedule });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+      // Création d'une nouvelle instance du modèle Schedule avec les données du body
+      const schedule = new Schedule(req.body);
+      // Sauvegarde dans la base de données
+      const savedSchedule = await schedule.save();
+      res.status(201).json(savedSchedule);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-};
+  },
 
-// ✅ **2. Récupérer le planning d'un utilisateur**
-module.exports.getUserSchedule = async (req, res) => {
+  /**
+   * Récupère tous les horaires.
+   */
+  getSchedule: async (req, res) => {
     try {
-        const { userId } = req.params;
-
-        const schedule = await Schedule.findOne({ user: userId }).populate("user").populate("weeks.days.user").populate("weeks.days.status");
-
-        if (!schedule) {
-            return res.status(404).json({ message: "Aucun planning trouvé pour cet utilisateur." });
-        }
-
-        res.status(200).json(schedule);
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+      const schedules = await Schedule.find();
+      res.status(200).json(schedules);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-};
+  },
 
-// ✅ **3. Mettre à jour un jour spécifique dans une semaine**
-module.exports.updateDaySchedule = async (req, res) => {
+  /**
+   * Met à jour un horaire existant.
+   * L'identifiant du document à mettre à jour est passé en paramètre (req.params.id)
+   * et on attend dans req.body la ou les clés à mettre à jour.
+   */
+  putSchedule: async (req, res) => {
     try {
-        const { userId, weekNumber, day } = req.params;
-        const { status } = req.body;
-
-        const schedule = await Schedule.findOne({ user: userId });
-
-        if (!schedule) {
-            return res.status(404).json({ message: "Planning non trouvé." });
-        }
-
-        const week = schedule.weeks.find(w => w.weekNumber === parseInt(weekNumber));
-
-        if (!week || !week.days[day]) {
-            return res.status(404).json({ message: "Jour ou semaine introuvable." });
-        }
-
-        week.days[day][0].status = status; // Mise à jour du statut
-
-        await schedule.save();
-        res.status(200).json({ message: "Planning mis à jour", schedule });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+      const { id } = req.params;
+      // Mise à jour du document avec les données du body
+      const updatedSchedule = await Schedule.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
+      if (!updatedSchedule) {
+        return res.status(404).json({ error: "Schedule not found" });
+      }
+      res.status(200).json(updatedSchedule);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-};
+  },
 
-// ✅ **4. Supprimer un planning**
-module.exports.deleteSchedule = async (req, res) => {
+  /**
+   * Supprime un horaire existant.
+   * L'identifiant du document à supprimer est passé en paramètre (req.params.id).
+   */
+  delSchedule: async (req, res) => {
     try {
-        const { userId } = req.params;
-
-        const deletedSchedule = await Schedule.findOneAndDelete({ user: userId });
-
-        if (!deletedSchedule) {
-            return res.status(404).json({ message: "Planning non trouvé." });
-        }
-
-        res.status(200).json({ message: "Planning supprimé avec succès." });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+      const { id } = req.params;
+      const deletedSchedule = await Schedule.findByIdAndDelete(id);
+      if (!deletedSchedule) {
+        return res.status(404).json({ error: "Schedule not found" });
+      }
+      res.status(200).json({ message: "Schedule deleted successfully" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
+  },
 };
