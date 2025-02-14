@@ -19,7 +19,7 @@ app.use(cors({
 
 // Configuration des sessions
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'supersecretkey',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false, // false en développement, true en production (avec HTTPS)
