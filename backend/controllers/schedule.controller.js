@@ -1,4 +1,6 @@
 const Schedule = require("../models/schedule");
+const mongoose = require("mongoose");
+
 
 module.exports = {
 /**
@@ -7,13 +9,36 @@ module.exports = {
    */
 setSchedule: async (req, res) => {
     try {
+      console.log("📥 Requête reçue pour créer un planning :", JSON.stringify(req.body, null, 2));
       // Création d'une nouvelle instance du modèle Schedule avec les données du body
-        const schedule = new Schedule(req.body);
+
+
+      const { shifts, user } = req.body;
+        if (!shifts || !user) {
+            console.error("❌ ERREUR : Les données 'shifts' et 'user' sont requises !");
+            return res.status(400).json({ error: "Les données 'shifts' et 'user' sont requises." });
+        }
+      
+      // Construction des données pour MongoDB
+       //  Convertir `user` en ObjectId
+        const schedule = new Schedule({
+            shifts,
+            user: new mongoose.Types.ObjectId(user) 
+        });
+      
+
       // Sauvegarde dans la base de données
-    const savedSchedule = await schedule.save();
-        res.status(201).json(savedSchedule);
+      const savedSchedule = await schedule.save();
+      console.log("✅ Planning enregistré :", savedSchedule);
+
+      res.status(201).json(savedSchedule);
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+      console.error("❌ Erreur serveur :", err);
+      res.status(500).json({ error: "Erreur interne du serveur" });
+
+
+
     }
     },
 
