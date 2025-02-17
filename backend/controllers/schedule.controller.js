@@ -28,7 +28,6 @@ module.exports = {
       //  Convertir `user` en ObjectId
       const schedule = new Schedule({
         shifts,
-        user: new mongoose.Types.ObjectId(user),
       });
 
       // Sauvegarde dans la base de données
