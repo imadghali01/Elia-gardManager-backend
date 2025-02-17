@@ -1,32 +1,110 @@
 const Switch = require("../models/switch");
-
+const Schedule = require("../models/Schedule");
 module.exports = {
-  /**
-   * Crée un nouveau switch.
-   * Expects dans le body une structure (par exemple) { name: "Nom du switch", state: true/false }
-   */
   setSwitch: async (req, res) => {
     try {
       const { userOne, userTwo, type, dateIn, dateOut } = req.body;
 
-    // Vérification des champs obligatoires
-    if (!userOne || !type || !dateIn) {
-      return res.status(400).json({ message: "Données manquantes" });
+      // 1) Vérification de la présence des champs requis
+      if (!userOne || !userTwo || !type || !dateIn || !dateOut) {
+        return res.status(400).json({
+          message:
+            "Champs manquants : userOne, userTwo, type, dateIn, dateOut requis.",
+        });
       }
-      // Création d'une nouvelle instance du modèle à partir des données reçues dans req.body
+
+      // 2) Création / enregistrement du nouveau Switch
       const newSwitch = new Switch({
         userOne,
-        userTwo: userTwo || null, // Optionnel
+        userTwo,
         type,
-        state: "waiting", // État initial
+        state: "waiting",
         dateIn,
-        dateOut: dateOut || null, // Optionnel
+        dateOut,
       });
       await newSwitch.save();
-    res.status(201).json({ message: "Switch enregistré avec succès", newSwitch });
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de l'enregistrement", error });
-  }
+
+      // 3) Convertir dateIn / dateOut en objets Date pour comparaison
+      const dIn = new Date(dateIn);
+      const dOut = new Date(dateOut);
+
+      // 4) Récupération de tous les Schedules (ou filtrés selon ta logique)
+      //    Ici, on les prend tous, puis on testera en code si au moins une date est dans [dIn, dOut].
+      const allSchedules = await Schedule.find({});
+
+      // On va stocker ici les plannings qui ont été effectivement modifiés
+      const updatedSchedules = [];
+
+      // 5) Parcours de chaque Schedule pour voir s’il contient AU MOINS UNE date dans l’intervalle
+      for (const schedule of allSchedules) {
+        let hasDateInRange = false; // Pour savoir si on a rencontré au moins UNE date dans [dIn, dOut]
+        let scheduleNeedsSave = false; // Pour savoir si on a modifié quelque chose dans ce schedule
+
+        // Parcours de tous les shifts (shift1, shift2, etc.)
+        for (const shiftKey in schedule.shifts) {
+          const shift = schedule.shifts[shiftKey];
+
+          // Parcours de chaque jour (lundi, mardi, etc.)
+          for (const dayKey in shift) {
+            const dayData = shift[dayKey];
+            // Format attendu : [ dateJour, userId, statusId ]
+
+            if (!Array.isArray(dayData) || dayData.length < 2) {
+              // Données invalides ou incomplètes, on ignore
+              continue;
+            }
+
+            const [currentDate, assignedUser] = dayData;
+
+            // Vérifie si la date du jour est dans l'intervalle [dIn, dOut]
+            if (currentDate >= dIn && currentDate <= dOut) {
+              hasDateInRange = true;
+
+              // Si c'est l'userOne, on le remplace par userTwo
+              if (String(assignedUser) === String(userOne)) {
+                dayData[1] = userTwo;
+                scheduleNeedsSave = true;
+              }
+            }
+          }
+        }
+
+        // Si le schedule contient au moins une date dans l’intervalle
+        // et qu’on a fait au moins un changement (scheduleNeedsSave),
+        // on enregistre le planning modifié.
+        if (hasDateInRange && scheduleNeedsSave) {
+          await schedule.save();
+          updatedSchedules.push(schedule);
+        }
+        // Si le schedule a une date dans l’intervalle mais qu’aucun remplacement userOne -> userTwo
+        // n’a été fait, on ne le push pas dans updatedSchedules.
+        // À toi d’adapter selon que tu veuilles quand même le renvoyer ou pas.
+      }
+
+      // 6) Réponse
+      //    - On peut décider de retourner un 200 même si aucun schedule n’a été mis à jour
+      //      ou, comme ci-dessous, préciser quand rien n’a changé.
+      if (updatedSchedules.length === 0) {
+        return res.status(200).json({
+          message:
+            "Switch créé, mais aucun schedule n'a été mis à jour (aucune date concernée ou aucun userOne à remplacer).",
+          switch: newSwitch,
+          updatedSchedules,
+        });
+      }
+
+      return res.status(200).json({
+        message: "Switch créé et schedules mis à jour avec succès.",
+        switch: newSwitch,
+        updatedSchedules,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message:
+          "Erreur lors de la création du switch ou de la mise à jour des plannings",
+        error: error.message,
+      });
+    }
   },
 
   /**
@@ -83,26 +161,25 @@ module.exports = {
    */
   putSwitchState: async (req, res) => {
     try {
-        const { id } = req.params;
-        const updateData = req.body; // Prend toutes les clés à mettre à jour
+      const { id } = req.params;
+      const updateData = req.body; // Prend toutes les clés à mettre à jour
 
-        // Mise à jour dynamique du document avec les nouvelles valeurs
-        const updatedSwitch = await Switch.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true, runValidators: true } // Retourne le document mis à jour et applique les validateurs
-        );
+      // Mise à jour dynamique du document avec les nouvelles valeurs
+      const updatedSwitch = await Switch.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true, runValidators: true } // Retourne le document mis à jour et applique les validateurs
+      );
 
-        if (!updatedSwitch) {
-            return res.status(404).json({ error: "Switch non trouvé" });
-        }
+      if (!updatedSwitch) {
+        return res.status(404).json({ error: "Switch non trouvé" });
+      }
 
-        res.status(200).json(updatedSwitch);
+      res.status(200).json(updatedSwitch);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
     }
-},
-
+  },
 
   /**
    * Supprime un switch identifié par son id.

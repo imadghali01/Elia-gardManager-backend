@@ -12,7 +12,7 @@ const {
   delUser,
 } = require("../controllers/user.controller.js");
 
-// Création d'un utilisateur 
+// Création d'un utilisateur
 router.post("/", setUser);
 
 // Connexion
@@ -22,15 +22,15 @@ router.post("/login", login);
 router.get("/logout", logout);
 
 // Récupérer de l'utilisatuer connecté
-router.get("/me",getCurrentUser);
+router.get("/me", getCurrentUser);
 
 // Récupération de tous les utilisateurs
 router.get("/", getUsers);
 
-// Mise à jour d'un utilisateur 
-router.put("/:id",putUser);
+// Mise à jour d'un utilisateur
+router.put("/:id", putUser);
 
-// Supperssion d'un utilisateur 
-router.delete("/:id",delUser);
+// Supperssion d'un utilisateur
+router.delete("/:id", delUser);
 
 module.exports = router;
