@@ -1,5 +1,5 @@
 const express = require("express");
-const authMiddleware = require("../middlewares/authMiddlewares");
+// const authMiddleware = require("../middlewares/authMiddlewares");
 const router = express.Router();
 
 const {
@@ -22,15 +22,15 @@ router.post("/login", login);
 router.get("/logout", logout);
 
 // Récupérer de l'utilisatuer connecté
-router.get("/me", authMiddleware,getCurrentUser);
+router.get("/me",getCurrentUser);
 
 // Récupération de tous les utilisateurs
-router.get("/", authMiddleware,getUsers);
+router.get("/", getUsers);
 
 // Mise à jour d'un utilisateur 
-router.put("/:id", authMiddleware,putUser);
+router.put("/:id",putUser);
 
 // Supperssion d'un utilisateur 
-router.delete("/:id", authMiddleware,delUser);
+router.delete("/:id",delUser);
 
 module.exports = router;
