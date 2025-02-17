@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const dotenv = require("dotenv").config();
-const connectDB = require("./backend/config.js/connection.js");
+const connectDB = require("./backend/config/connection.js");
 const port = 8000;
 
 //connection to db

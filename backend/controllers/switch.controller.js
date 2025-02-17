@@ -83,25 +83,26 @@ module.exports = {
    */
   putSwitchState: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { state } = req.body;
+        const { id } = req.params;
+        const updateData = req.body; // Prend toutes les clés à mettre à jour
 
-      // Mise à jour du document et retour du nouveau document modifié
-      const updatedSwitch = await Switch.findByIdAndUpdate(
-        id,
-        { state },
-        { new: true, runValidators: true }
-      );
+        // Mise à jour dynamique du document avec les nouvelles valeurs
+        const updatedSwitch = await Switch.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true, runValidators: true } // Retourne le document mis à jour et applique les validateurs
+        );
 
-      if (!updatedSwitch) {
-        return res.status(404).json({ error: "Switch non trouvé" });
-      }
+        if (!updatedSwitch) {
+            return res.status(404).json({ error: "Switch non trouvé" });
+        }
 
-      res.status(200).json(updatedSwitch);
+        res.status(200).json(updatedSwitch);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+        res.status(400).json({ error: error.message });
     }
-  },
+},
+
 
   /**
    * Supprime un switch identifié par son id.
