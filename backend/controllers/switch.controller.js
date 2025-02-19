@@ -7,7 +7,7 @@ module.exports = {
    */
   setSwitch: async (req, res) => {
     try {
-      const { userOne, userTwo, type, dateIn, dateOut } = req.body;
+      const { userOne, userTwo, type, reason, dateIn, dateOut } = req.body;
 
       // 1) Vérification de la présence des champs requis
       if (!userOne || !userTwo || !type || !dateIn || !dateOut) {
@@ -22,6 +22,7 @@ module.exports = {
         userOne,
         userTwo,
         type,
+        reason,
         state: "waiting",
         dateIn,
         dateOut,
