@@ -15,7 +15,6 @@ const switchSchema = mongoose.Schema(
     reason: {
       type: String,
       enum: ["confort", "sickness", "holidays"],
-      default: null,
     },
     state: {
       type: String,
