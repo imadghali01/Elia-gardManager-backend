@@ -12,6 +12,10 @@ const switchSchema = mongoose.Schema(
       type: String,
       enum: ["offer", "request"],
     },
+    reason: {
+      type: String,
+      enum: ["confort", "sickness", "holidays"],
+    },
     state: {
       type: String,
       enum: ["waiting", "processing", "validate"],
