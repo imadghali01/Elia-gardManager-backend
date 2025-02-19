@@ -1,44 +1,41 @@
-import { useState, useEffect } from "react";
-import IphoneContainer from "../components/IphoneContainer";
-import ShiftCard from "../components/ShiftCard";
+async function getSwitchesAndUsers() {
+  try {
+    // 1. Récupération des données "switch"
+    const switchRes = await fetch("http://localhost:8000/switch");
+    const allSwitches = await switchRes.json();
 
-export default function ShiftCardAdmin() {
-  const [availableShifts, setAvailableShifts] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState([]);
-  const [finishedShifts, setFinishedShifts] = useState([]);
+    // 2. Récupération des données "user"
+    const userRes = await fetch("http://localhost:8000/user");
+    const allUsers = await userRes.json();
 
-  useEffect(() => {
-    const fetchShifts = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/switch");
-        if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des shifts");
-        }
-        const data = await response.json();
+    // 3. Création d'une map { userId: userObject }
+    const usersMap = allUsers.reduce((acc, user) => {
+      acc[user._id] = user;
+      return acc;
+    }, {});
 
-        // Trier les shifts selon leur état
-        const available = data.filter((shift) => shift.state === "waiting");
-        const pending = data.filter((shift) => shift.state === "processing");
-        const finished = data.filter((shift) => shift.state === "validate");
+    // 4. Fusion switch & user
+    const mergedData = allSwitches.map((sw) => {
+      const associatedUser = usersMap[sw.userOne] || {};
+      return { ...sw, ...associatedUser };
+    });
 
-        setAvailableShifts(available);
-        setPendingRequests(pending);
-        setFinishedShifts(finished);
-      } catch (error) {
-        console.error("Erreur:", error);
-      }
+    // 5. Tri en trois tableaux distincts selon la valeur de "state"
+    const available = mergedData.filter((item) => item.state === "waiting");
+    const pending = mergedData.filter((item) => item.state === "processing");
+    const finished = mergedData.filter((item) => item.state === "validate");
+
+    // 6. Retourne un objet contenant les trois tableaux
+    return {
+      available,
+      pending,
+      finished,
     };
-
-    fetchShifts();
-  }, []);
-
-  return (
-    <IphoneContainer>
-      <ShiftCard
-        availableShifts={availableShifts}
-        pendingRequests={pendingRequests}
-        finishedShifts={finishedShifts}
-      />
-    </IphoneContainer>
-  );
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération ou du tri des données :",
+      error
+    );
+    throw error;
+  }
 }
