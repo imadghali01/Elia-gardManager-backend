@@ -7,10 +7,10 @@ module.exports = {
    */
   setSwitch: async (req, res) => {
     try {
-      const { userOne, userTwo, type, dateIn, dateOut } = req.body;
+      const { userOne, userTwo, type, reason, dateIn, dateOut } = req.body;
 
       // 1) Vérification de la présence des champs requis
-      if (!userOne || !userTwo || !type || !dateIn || !dateOut) {
+      if (!userOne || !type || !dateIn || !dateOut) {
         return res.status(400).json({
           message:
             "Champs manquants : userOne, userTwo, type, dateIn, dateOut requis.",
@@ -22,11 +22,13 @@ module.exports = {
         userOne,
         userTwo,
         type,
+        reason,
         state: "waiting",
         dateIn,
         dateOut,
       });
       await newSwitch.save();
+      return res.status(200).json({ message: "switch creer" });
     } catch (error) {
       console.error("Erreur lors de la récupération des switches:", error);
       res.status(500).json({ message: "Erreur serveur" });
