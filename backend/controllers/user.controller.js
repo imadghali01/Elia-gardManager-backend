@@ -85,7 +85,7 @@ module.exports = {
 
       return res.status(200).json({
         message: "Connexion réussie", // ça informe à le frontend que la connecion est réussie.
-        userId: user._id,
+        userId: user.email,
         role: user.activity,
         location: user.location,
         // --> Ici ça retourne l'ID stocké en session, pour faire la vérification côté frontend.
