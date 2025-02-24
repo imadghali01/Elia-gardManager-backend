@@ -55,7 +55,7 @@ module.exports = {
       // Récupération des switches où l'utilisateur est dans le champ userOne
       const switches = await Switch.find({ userOne: userId });
       let userBalance = 0;
-      const msPerDay = 24 * 60 * 60 * 1000; // Nombre de millisecondes dans une journée
+      const msPerDay = 60 * 60 * 1000; // Nombre de millisecondes dans une journée
 
       for (let sw of switches) {
         if (sw.state !== "validate") continue;
@@ -66,7 +66,7 @@ module.exports = {
 
         // Calcul de la différence en jours de façon robuste
         // Utilisation de Math.floor et ajout de 1 pour inclure le jour de départ
-        const diffDays = Math.floor((dateOut - dateIn) / msPerDay) + 1;
+        const diffDays = Math.floor((dateOut - dateIn) / msPerDay) + 24;
 
         if (sw.type === "offer") {
           userBalance += diffDays;
