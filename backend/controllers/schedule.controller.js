@@ -12,8 +12,6 @@ module.exports = {
         "📥 Requête reçue pour créer un planning :",
         JSON.stringify(req.body, null, 2)
       );
-      // Création d'une nouvelle instance du modèle Schedule avec les données du body
-
       const { shifts, user } = req.body;
       if (!shifts || !user) {
         console.error(
@@ -23,17 +21,9 @@ module.exports = {
           .status(400)
           .json({ error: "Les données 'shifts' et 'user' sont requises." });
       }
-
-      // Construction des données pour MongoDB
-      //  Convertir `user` en ObjectId
-      const schedule = new Schedule({
-        shifts,
-      });
-
-      // Sauvegarde dans la base de données
+      const schedule = new Schedule({ shifts });
       const savedSchedule = await schedule.save();
       console.log("✅ Planning enregistré :", savedSchedule);
-
       res.status(201).json(savedSchedule);
     } catch (err) {
       console.error("❌ Erreur serveur :", err);
@@ -71,6 +61,76 @@ module.exports = {
       res.status(200).json(updatedSchedule);
     } catch (err) {
       res.status(500).json({ error: err.message });
+    }
+  },
+
+  /**
+   * Valide le switch et met à jour les schedules.
+   * Pour chaque shift et pour chaque jour dont la date (dayData[0])
+   * est comprise entre dateIn et dateOut, si dayData[1] correspond à userOne,
+   * on le remplace par userTwo.
+   * On attend dans req.body un objet contenant : dateIn, dateOut, userOne, userTwo.
+   */
+  validateSwitch: async (req, res) => {
+    try {
+      const { dateIn, dateOut, userOne, userTwo } = req.body;
+      const dIn = new Date(dateIn);
+      const dOut = new Date(dateOut);
+
+      // Récupération de tous les schedules
+      const allSchedules = await Schedule.find({});
+      const updatedSchedules = [];
+
+      // Parcours de chaque schedule
+      for (const schedule of allSchedules) {
+        let hasDateInRange = false; // Au moins une date dans l'intervalle
+        let scheduleNeedsSave = false; // Indique si le schedule a été modifié
+
+        // Parcours de chaque shift dans le schedule
+        for (const shiftKey in schedule.shifts) {
+          const shift = schedule.shifts[shiftKey];
+
+          // Parcours de chaque jour dans le shift (ex : lundi, mardi, etc.)
+          for (const dayKey in shift) {
+            const dayData = shift[dayKey];
+            // Format attendu : [ dateJour, userId, statusId ]
+            if (!Array.isArray(dayData) || dayData.length < 2) continue;
+
+            const [currentDate, assignedUser] = dayData;
+            const currentDateObj = new Date(currentDate);
+
+            // Vérifie si la date se trouve dans l'intervalle [dIn, dOut]
+            if (currentDateObj >= dIn && currentDateObj <= dOut) {
+              hasDateInRange = true;
+              // Si l'utilisateur assigné correspond à userOne, on le remplace par userTwo
+              if (String(assignedUser) === String(userOne)) {
+                dayData[1] = userTwo;
+                scheduleNeedsSave = true;
+              }
+            }
+          }
+        }
+
+        // Si le schedule a été modifié, on le sauvegarde
+        if (hasDateInRange && scheduleNeedsSave) {
+          await schedule.save();
+          updatedSchedules.push(schedule);
+        }
+      }
+
+      const message =
+        updatedSchedules.length === 0
+          ? "Switch créé, mais aucun schedule n'a été mis à jour (aucune date concernée ou aucun userOne à remplacer)."
+          : "Switch créé et schedules mis à jour avec succès.";
+
+      return res.status(200).json({
+        message,
+        switch: req.body,
+        updatedSchedules,
+      });
+    } catch (err) {
+      console.error("❌ Erreur lors de la validation du switch :", err);
+      return res.status(500).json({ error: "Erreur interne du serveur" });
     }
   },
 
